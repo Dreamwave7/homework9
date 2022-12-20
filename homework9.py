@@ -2,7 +2,16 @@ dict_users = {    # словник з номерами и именами люд�
     "dima": "039902003",
     "elena": "9000299192",
     "arsen": "9292123222"
-    }   
+    }
+
+def input_error(func):
+    def inner(*args):
+        try:
+            return func(*args)
+        except IndexError:
+            return 'Sorry, not enough params for command'
+    return inner
+
 
 def say_bye():  
     return "Goob bye, see u soon"
@@ -18,9 +27,11 @@ def show_all(smt):
         info += f"Name: {name.title()}  Number: {number}\n"
     return info
 
-
-def add_user(name, phone):
-    dict_users[name]= phone
+@input_error
+def add_user(*args):
+    name = args[0]
+    phone = args[1]
+    dict_users[name] = phone
     return f"You added new user {name.title()} with phone {phone}"
 
 
@@ -78,7 +89,7 @@ def main():
             print(change_user(list_input[-2],list_input[-1]))
         
         elif input_user.startswith("add"):
-            print(add_user(list_input[-2], list_input[-1]))
+            print(add_user(*list_input[1:]))
             
             
  
