@@ -4,6 +4,7 @@ dict_users = {    # словник з номерами и именами люд�
     "arsen": "9292123222"
 }   
 
+
 def input_error(func):    #декоратор
     def inner(*args):
         try:
@@ -14,77 +15,86 @@ def input_error(func):    #декоратор
             return "Something went wrong"
     return inner
 
-def say_bye():  
+
+def say_bye():
     return "Goob bye, see u soon"
 
 
-def hello_answer(smt):
+def hello_answer(*args):
     return "Hello, glad to see u\nHow can I help you?"
 
+
 @input_error
-def show_all(smt):
+def show_all(*args):
     info = ""
     for name, number in dict_users.items():
         info += f"Name: {name.title()}  Number: {number}\n"
     return info
 
+
 @input_error
-def add_user(name, phone):
+def add_user(*args):
+    name = args[-2]
+    phone = args[-1]
     dict_users[name]= phone
     return f"You added new user {name.title()} with phone {phone}"
 
-@input_error
-def change_user(user, phone):
-    if user in dict_users:
-        dict_users[user] = phone
-        return f"Now {user.title()} has new number - {phone}"
-    else:
-        return f"{user.title()} not exist in dictionary"
 
 @input_error
-def show_phone(user):
+def change_user(*args):
+    name = args[-2]
+    phone = args[-1]
+    if name in dict_users:
+        dict_users[name] = phone
+        return f"Now {name.title()} has new number - {phone}"
+    else:
+        return f"{name.title()} not exist in dictionary"
+
+
+@input_error
+def show_phone(*args):
+    user = args[-1]
     phone = dict_users.get(user)
     return f"{user.title()} has phone - {phone}"
 
 
+OPERATIONS = {
+    "hello":    hello_answer,
+    "show all": show_all,
+    "phone":    show_phone,
+    "change":   change_user,
+    "add":      add_user,
+    "good bye": say_bye,
+    "close":    say_bye,
+    "exit":     say_bye,
+    ".":        say_bye
+    
+}
 
-                        
+
+def command_parser(text: str):
+    for command_name, command in OPERATIONS.items():
+        if text.startswith(command_name):
+            return command, text.replace(command_name, '').strip().split()
+    return None, None
 
 
 def main():
     while True:
         input_user = input("Enter your command: ").lower()
-        list_input = input_user.split()
-        
-        if input_user in (".", "good bye", "exit", "close"):
-            print(say_bye())
+        command, data = command_parser(input_user)
+        if command:
+            print(command(*data))
+        elif input_user == ".":
             break
-        
-        elif input_user == "hello":
-            print(hello_answer("smt"))
-            
-        elif input_user == ("show all"):
-            print(show_all("smt"))
-            
-        elif input_user.startswith("phone"):
-            print(show_phone(list_input[-1]))
-        
-        elif input_user.startswith("change"):
-            print(change_user(list_input[-2],list_input[-1]))
-        
-        elif input_user.startswith("add"):
-            print(add_user(list_input[-2], list_input[-1]))
-            
-            
+        else:
+            print("Not found your command")  
  
       
         
            
 if __name__ == "__main__":
     main()
-
-
-
 
 
 
